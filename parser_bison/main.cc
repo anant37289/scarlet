@@ -8,12 +8,11 @@
 #include <token/token.hh>
 #include <tools/color/color.hh>
 
-std::string identifier, func_identifier;
-std::map<std::string, identifier_info> symbol_table;
-std::string storage_class_string = "";
-std::string type_string = "";
-int global_counter = 0;
-void yyerror(const char *s) { fprintf(stderr, "Error: %s\n", s); }
+std::string identifier;
+
+void yyerror(const char* s) {
+    fprintf(stderr, "Error: %s\n", s);
+}
 
 std::vector<scarlet::token::Token> tokens;
 size_t current_token_index = 0;

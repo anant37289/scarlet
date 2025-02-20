@@ -3,11 +3,14 @@
 #include <stdlib.h>
 #include <map>
 #include <string>
-#include "symbol_table.h"
+#include<string.h>
 
 int yylex();
 void yyerror(const char* s);
-extern std::string identifier,storage_class_string,type_string,func_identifier;
+
+char type_string[1000];
+bool type_set = false;
+extern const char* identifier;
 %}
 
 %union {
@@ -189,6 +192,7 @@ declaration
     : declaration_specifiers SEMICOLON
     | declaration_specifiers init_declarator_list SEMICOLON
     {
+        type_string[0] = '\0';
     }
     ;
 
@@ -212,21 +216,21 @@ init_declarator
     ;
 
 storage_class_specifier
-    : TYPEDEF{storage_class_string += "TYPEDEF ";}
-    | EXTERN{storage_class_string += "EXTERN ";    }
-    | STATIC{storage_class_string += "STATIC ";    }
-    | AUTO{storage_class_string += "AUTO ";    }
-    | REGISTER{storage_class_string += "REGISTER ";    }
+    : TYPEDEF{strcat(type_string, " typedef");}
+    | EXTERN{strcat(type_string, " extern");    }
+    | STATIC{strcat(type_string, " static");    }
+    | AUTO{strcat(type_string, " auto");    }
+    | REGISTER{strcat(type_string, " register");    }
     ;
 
 type_specifier
-    : VOID{type_string += "VOID ";    }
-    | CHAR{type_string += "CHAR ";    }
-    | INT{type_string += "INT ";    }
-    | LONG{type_string += "LONG ";    }
-    | SIGNED{type_string += "SIGNED ";    }
-    | UNSIGNED{type_string += "UNSIGNED ";    }
-    | DOUBLE{type_string += "DOUBLE ";    }
+    : VOID{strcat(type_string, " void");    }
+    | CHAR{strcat(type_string, " char");    }
+    | INT{strcat(type_string, " int");    }
+    | LONG{strcat(type_string, " long");    }
+    | SIGNED{strcat(type_string, " signed");    }
+    | UNSIGNED{strcat(type_string, " unsigned");    }
+    | DOUBLE{strcat(type_string, " double");    }
     | struct_or_union_specifier
     | enum_specifier
     ;
@@ -234,21 +238,13 @@ type_specifier
 struct_or_union_specifier
     : struct_or_union IDENTIFIER 
     {
-        type_string += "STRUCT";
-        symbol_table[identifier].type = type_string;
-        symbol_table[identifier].storage_class = storage_class_string;
-        type_string = "";
-        storage_class_string = "";
+        printf("struct, %s\n", identifier);
     }
     OPEN_BRACE struct_declaration_list CLOSE_BRACE
     | struct_or_union OPEN_BRACE struct_declaration_list CLOSE_BRACE 
     | struct_or_union IDENTIFIER
     {
-        type_string += "STRUCT ";
-        symbol_table[identifier].type = type_string;
-        symbol_table[identifier].storage_class = storage_class_string;
-        type_string = "";
-        storage_class_string = "";
+        printf("struct, %s\n", identifier);
     }
     ;
 
@@ -265,7 +261,7 @@ struct_declaration_list
 struct_declaration
     : specifier_qualifier_list struct_declarator_list SEMICOLON
     {
-        type_string[0] = '\0';
+        type_string = "";
     }
     ;
 
@@ -347,27 +343,41 @@ declarator
 direct_declarator
     : IDENTIFIER
     {
-        symbol_table[identifier].usage += "VARIABLE ";
-        func_identifier = identifier ;
-        symbol_table[identifier].type = type_string;
-        symbol_table[identifier].storage_class = storage_class_string;
-        type_string = "";
-        storage_class_string = "";
-        
+        printf("%s, %s\n", type_string, identifier);
     }
     | OPEN_PARANTHESES declarator CLOSE_PARANTHESES
-    | direct_declarator OPEN_BRACKET { symbol_table[func_identifier].usage += "ARRAY ";} constant_exp CLOSE_BRACKET
-    | direct_declarator OPEN_BRACKET { symbol_table[func_identifier].usage += "ARRAY ";} CLOSE_BRACKET
-    | direct_declarator OPEN_PARANTHESES { symbol_table[func_identifier].usage += "PROCEDURE ";} parameter_type_list CLOSE_PARANTHESES
-    | direct_declarator OPEN_PARANTHESES { symbol_table[func_identifier].usage += "PROCEDURE ";} identifier_list CLOSE_PARANTHESES
-    | direct_declarator OPEN_PARANTHESES { symbol_table[func_identifier].usage += "PROCEDURE ";} CLOSE_PARANTHESES
+    {
+        type_string[0] = '\0';
+    }
+    | direct_declarator OPEN_BRACKET constant_exp CLOSE_BRACKET
+    {
+        type_string[0] = '\0';
+    }
+    | direct_declarator OPEN_BRACKET CLOSE_BRACKET
+    {
+        type_string[0] = '\0';
+    }
+    | direct_declarator OPEN_PARANTHESES {
+        printf("aare vo function tha\n");
+        type_string[0] = '\0';
+    } parameter_type_list CLOSE_PARANTHESES{
+        type_string[0] = '\0';
+    }
+    | direct_declarator OPEN_PARANTHESES identifier_list CLOSE_PARANTHESES
+    {
+        type_string[0] = '\0';
+    }
+    | direct_declarator OPEN_PARANTHESES CLOSE_PARANTHESES
+    {
+       type_string[0] = '\0';
+    }
     ;
 
 pointer
-    : ASTERISK
-    | ASTERISK type_qualifier_list
-    | ASTERISK pointer
-    | ASTERISK type_qualifier_list pointer
+    : ASTERISK{strcat(type_string, " pointer");}
+    | ASTERISK type_qualifier_list{strcat(type_string, " pointer");}
+    | ASTERISK pointer{strcat(type_string, " pointer");}
+    | ASTERISK type_qualifier_list pointer{strcat(type_string, " pointer");}
     ;
 
 type_qualifier_list
@@ -383,7 +393,7 @@ parameter_type_list
 parameter_list
     : parameter_declaration
     | parameter_list COMMA{
-        
+        type_string[0] = '\0';
     } parameter_declaration
     ;
 
