@@ -341,6 +341,8 @@ void lexer::tokenize() {
         tokens.emplace_back(token::TOKEN::STRUCT);
       } else if (identifier == "goto") {
         tokens.emplace_back(token::TOKEN::GOTO);
+      } else if (identifier == "char") {
+        tokens.emplace_back(token::TOKEN::CHAR);
       } else {
         tokens.emplace_back(token::Token(token::TOKEN::IDENTIFIER, identifier));
       }

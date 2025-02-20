@@ -418,6 +418,7 @@ statement
     | iteration_statement
     | jump_statement
     | declaration
+    | error {yyerrok;}
     ;
 
 labeled_statement

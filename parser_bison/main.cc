@@ -27,6 +27,7 @@ int yylex() {
         return 0;  // Return 0 to indicate EOF
     }
 
+    
     // Get current token
     scarlet::token::Token& current_token = tokens[current_token_index++];
     scarlet::token::TOKEN token_type = current_token.get_token();

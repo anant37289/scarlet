@@ -31,6 +31,8 @@ public:
   void print_symbol_table();
   void print_error_recovery();
   bool is_success() { return success; }
+  int get_line_number() { return line_number; }
+  int get_col_number() { return col_number; }
 };
 } // namespace lexer
 } // namespace scarlet
