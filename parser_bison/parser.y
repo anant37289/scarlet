@@ -11,6 +11,7 @@ void yyerror(const char* s);
 
 std::string type_string;
 extern std::string identifier;
+bool is_array = false;
 %}
 
 %union {
@@ -192,6 +193,7 @@ declaration
     : declaration_specifiers SEMICOLON
     | declaration_specifiers init_declarator_list SEMICOLON
     {
+        //done processing the declaration list
         type_string = "";
     }
     ;
@@ -320,14 +322,11 @@ direct_declarator
     }
     | direct_declarator OPEN_BRACKET constant_exp CLOSE_BRACKET
     {
-        type_string = "";
+        std::cout<<"arrey vo array thi"<<std::endl;
     }
     | direct_declarator OPEN_BRACKET CLOSE_BRACKET
-    {
-        type_string = "";
-    }
     | direct_declarator OPEN_PARANTHESES {
-        printf("aare vo function tha\n");
+        std::cout<<"arrey vo function tha"<<std::endl;
         type_string = "";
     } parameter_type_list CLOSE_PARANTHESES{
        type_string = "";

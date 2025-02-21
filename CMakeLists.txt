@@ -22,7 +22,6 @@ function(set_basic_compile_options target)
   target_compile_options(${target} PRIVATE 
     -Wall
     -Wextra
-    -Werror
     -fno-strict-aliasing
     -fwrapv
     -fpie
